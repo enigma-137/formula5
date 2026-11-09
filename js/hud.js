@@ -29,6 +29,8 @@ let towerT=0;
 export function updateHUD(dt){
   const order=standings(), game=G.game;
   huds.forEach(h=>{ const c=h.c; const set=(el,t)=>{ if(el && el.textContent!==t) el.textContent=t; };
+    // in cockpit view the steering-wheel screen shows speed/gear, so hide the big speedo
+    const vw=G.views.find(w=>w.car===c); h.el.classList.toggle('onboard',!!vw && vw.mode===3);
     set(h.pos,(order.indexOf(c)+1)+'/'+order.length);
     set(h.lap, S.mode==='tt'?String(Math.max(1,c.lap)):Math.min(Math.max(1,c.lap),game.laps)+'/'+game.laps);
     set(h.cur, fmt(G.state==='race'&&!c.finished?G.raceTime-c.lapStart:(c.finished?c.finishTime:0)));

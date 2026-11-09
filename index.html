@@ -17,7 +17,7 @@
 <div id="tower"></div>
 <canvas id="map" width="340" height="340"></canvas>
 <div id="lights"><i></i><i></i><i></i><i></i><i></i></div>
-<div id="topbtns"><button id="muteBtn">🔊</button><button id="pauseBtn">❚❚</button></div>
+<div id="topbtns"><button id="camBtn" title="Change camera">🎥</button><button id="muteBtn">🔊</button><button id="pauseBtn">❚❚</button></div>
 <div id="touch"><div id="tL">◀</div><div id="tR">▶</div><div id="tB">BRK</div><div id="tG">GAS</div></div>
 
 <div id="rotate"><div class="ph"></div><b>Turn your phone sideways</b><small>Formula 5 is played in landscape</small></div>
@@ -41,6 +41,8 @@
     <button data-v="easy">Easy</button><button data-v="med">Medium</button><button data-v="hard">Hard</button></div></div>
    <div class="grp"><label>Graphics</label><div class="opts" data-k="gfx">
     <button data-v="high">High</button><button data-v="low">Low<span class="hide-short"> (older laptops)</span></button></div></div>
+   <div class="grp"><label>View</label><div class="opts" data-k="view">
+    <button data-v="chase">Chase cam</button><button data-v="cockpit">Cockpit</button></div></div>
    <div class="grp touch-only" id="g-steer"><label>Steering</label><div class="opts" data-k="steer">
     <button data-v="buttons">Buttons</button><button data-v="tilt">Tilt phone</button></div></div>
   </div>
@@ -49,7 +51,7 @@
   <button id="startBtn" class="start">START ▶</button>
   <div class="pad" id="padStatus"></div>
   <div class="help">
-   <b>Pad:</b> RT gas · LT brake · left stick steer · Y reset car · LB/RB camera · Start pause · A select in menus<br>
+   <b>Pad:</b> RT gas · LT brake · left stick steer · Y reset car · LB/RB camera (incl. cockpit view) · Start pause · A select in menus<br>
    <b>Keyboard:</b> P1 W A S D · P2 arrow keys (solo: either) · C/V camera · R reset · Esc pause · M mute<br>
    <b>Phone:</b> GAS / BRK buttons on the right, steer with ◀ ▶ or tilt the phone like a steering wheel<br>
    <b>2 Players:</b> split screen. P1 = first pad or WASD, P2 = second pad or arrows.

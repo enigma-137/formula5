@@ -12,6 +12,7 @@
      bots.js      AI drivers
      input.js     keyboard, touch, tilt, gamepad
      camera.js    cameras and rendering
+     cockpit.js   onboard view: halo, steering wheel, hands
      hud.js       HUD, timing tower, minimap
      audio.js     engine sound
      menu.js      menu / pause / results screens
@@ -22,6 +23,7 @@ import { S } from './config.js';
 import { G } from './state.js';
 import { buildWorld } from './tracks.js';
 import { placeMesh } from './cars.js';
+import { updateCockpit } from './cockpit.js';
 import { pollPadButtons } from './input.js';
 import { updateCam, render, renderMenu } from './camera.js';
 import { updateHUD, flash } from './hud.js';
@@ -42,7 +44,7 @@ function frame(t){
       if(S.mode!=='tt' && game.humans.every(c=>c.finished)){ G.endTimer+=dt; if(G.endTimer>2.5) showResults(); } }
     else simulate(dt);
     game.cars.forEach(c=>placeMesh(c,dt));
-    G.views.forEach(v=>updateCam(v,dt));
+    G.views.forEach(v=>{ updateCam(v,dt); if(v.mode===3) updateCockpit(v.car); });
     const f=G.views[0].car; G.sun.position.set(f.x+120,220,f.z+80); G.sun.target.position.set(f.x,0,f.z);
     updateHUD(dt);
     render();

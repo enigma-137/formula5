@@ -22,5 +22,5 @@ export const HUMANS = [['P1',0x00a35c,0xffffff],['P2',0xf5c400,0x111111]];
 export const DIFF = {easy:0.84, med:0.91, hard:0.975};
 
 /** Menu settings, persisted in localStorage. */
-export const S = Object.assign({mode:'race',track:'lagos',laps:3,bots:5,diff:'med',gfx:'high',steer:'buttons'}, store.get('f5_settings',{}));
+export const S = Object.assign({mode:'race',track:'lagos',laps:3,bots:5,diff:'med',gfx:'high',steer:'buttons',view:'chase'}, store.get('f5_settings',{}));
 if(!TRACKS[S.track]) S.track='lagos';

@@ -116,3 +116,4 @@ body.touch .rpm{margin:6px auto 0;width:150px}
   #touch div{width:74px;height:74px;bottom:12px}
   #tL{left:12px}#tR{left:96px}#tB{right:96px}#tG{right:12px}
 }
+.hud.onboard .br{display:none}

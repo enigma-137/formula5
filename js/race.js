@@ -6,6 +6,8 @@ import { G } from './state.js';
 import { makeRenderer } from './renderer.js';
 import { buildWorld } from './tracks.js';
 import { newCar, spawnSlot, placeMesh } from './cars.js';
+import { makeCockpit } from './cockpit.js';
+import { CAM_COCKPIT } from './camera.js';
 import { stepCar, collide, resetCar } from './physics.js';
 import { botInput } from './bots.js';
 import { readInput } from './input.js';
@@ -40,7 +42,7 @@ export function startGame(){
   cars.forEach((c,k)=>{ const s=spawnSlot(k); Object.assign(c,{x:s.x,z:s.z,h:s.h,idx:s.idx}); c.prevIdx=s.idx; placeMesh(c,0); });
   G.game={cars, humans:cars.filter(c=>c.human).sort((a,b)=>a.pi-b.pi), laps:S.mode==='tt'?Infinity:S.laps};
   G.views.length=0;
-  G.game.humans.forEach((c,k)=>{ const cam=new THREE.PerspectiveCamera(62,1,0.1,4000); G.views.push({cam,car:c,mode:store.get('f5_cam'+k,0),p:new THREE.Vector3(c.x-Math.sin(c.h)*9,3.4,c.z-Math.cos(c.h)*9),shake:0}); });
+  G.game.humans.forEach((c,k)=>{ const cam=new THREE.PerspectiveCamera(62,1,0.1,4000); makeCockpit(c); G.views.push({cam,car:c,mode:S.view==='cockpit'?CAM_COCKPIT:0,p:new THREE.Vector3(c.x-Math.sin(c.h)*9,3.4,c.z-Math.cos(c.h)*9),shake:0}); });
   buildHUD();
   G.raceTime=0; G.cd=0; G.finishCount=0; G.endTimer=0; G.fastest=null; G.state='countdown';
   showOverlay(null);

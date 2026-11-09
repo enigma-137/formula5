@@ -8,7 +8,7 @@ import { flash } from './hud.js';
 export function stepCar(c,inp,dt){
   const T=G.track; const off=Math.abs(c.lat)>T.hw+1.4;
   const vtop=off?40:VTOP; let v=c.v;
-  c.thr=inp.thr;
+  c.thr=inp.thr; c.brk=inp.brk;
   c.steer+=(inp.str-c.steer)*Math.min(1,dt*(c.human?9:7));
   if(inp.thr>0.02){ if(v<0) v+=30*inp.thr*dt; else v+=ACC*inp.thr*Math.max(0,1-(v/vtop)**2)*(off?0.6:1)*dt; }
   if(inp.brk>0.02){ if(v>0.5) v-=BRAKE*inp.brk*dt; else v=Math.max(-10,v-8*inp.brk*dt); }

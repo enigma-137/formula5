@@ -33,6 +33,7 @@ js/physics.js     driving model, walls, laps, collisions
 js/bots.js        AI drivers
 js/input.js       keyboard, touch, tilt, gamepad
 js/camera.js      cameras and split-screen rendering
+js/cockpit.js     onboard cockpit view (halo, wheel display, hands)
 js/hud.js         HUD, timing tower, minimap
 js/audio.js       engine sound
 js/menu.js        menu, pause and results screens
