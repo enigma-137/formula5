@@ -1,0 +1,119 @@
+:root{--g:#00a35c;--gd:#007a45;--gold:#f5c400;--ink:#0b0f0d;--panel:rgba(10,16,13,.88);--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#000;color:#fff;font-family:Rajdhani,system-ui,sans-serif;overflow:hidden;user-select:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px;z-index:20;background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.65))}
+.overlay.show{display:flex}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 24px;width:min(760px,100%);max-height:100%;overflow:auto;backdrop-filter:blur(8px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.logo{font-family:"Russo One",sans-serif;font-size:clamp(34px,7vw,56px);letter-spacing:2px;line-height:1}
+.logo span{color:var(--g);margin-left:6px}
+.logo i{display:inline-block;width:14px;height:40px;background:linear-gradient(90deg,var(--g) 33%,#fff 33% 66%,var(--g) 66%);margin-left:10px;vertical-align:middle;border-radius:2px;font-style:normal}
+.tag{opacity:.75;font-size:17px;margin:6px 0 14px}
+.grp{display:flex;align-items:center;gap:12px;margin:9px 0;flex-wrap:wrap}
+.grp>label{width:88px;font-weight:700;opacity:.7;text-transform:uppercase;font-size:13px;letter-spacing:1px}
+.opts{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+button{font-family:inherit;font-size:17px;font-weight:700;color:#fff;background:rgba(255,255,255,.07);border:2px solid transparent;border-radius:10px;padding:8px 14px;cursor:pointer;transition:background .12s,border-color .12s,transform .08s}
+button:hover{background:rgba(255,255,255,.14)}
+button.sel{background:var(--gd);border-color:var(--g)}
+button.focus,button:focus-visible{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(245,196,0,.35)}
+button:active{transform:scale(.97)}
+.tracks button{display:flex;flex-direction:column;align-items:flex-start;min-width:150px;text-align:left}
+.tracks small{font-weight:500;opacity:.75;font-size:13px}
+.start{display:block;width:100%;margin-top:14px;font-family:"Russo One";font-size:24px;padding:14px;background:var(--g);letter-spacing:2px}
+.start:hover{background:#00b868}
+.best{min-height:20px;opacity:.85;color:var(--gold);font-size:15px;margin-top:6px}
+.pad{margin-top:10px;font-size:15px;opacity:.85}
+.help{margin-top:8px;font-size:14px;opacity:.6;line-height:1.45}
+.help b{opacity:1;color:#fff}
+.row{display:flex;gap:10px;margin-top:16px}.row button{flex:1;padding:12px}
+h2{font-family:"Russo One";margin:0 0 12px;font-size:28px}
+table{width:100%;border-collapse:collapse;font-size:18px}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{opacity:.6;font-size:13px;text-transform:uppercase;letter-spacing:1px}
+tr.me td{color:var(--gold);font-weight:700}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+/* HUD */
+.hud{position:fixed;left:0;width:100%;pointer-events:none;z-index:5;font-weight:700;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+.hud .tl{position:absolute;left:14px;top:12px;display:flex;gap:10px}
+.box{background:rgba(0,0,0,.55);border-radius:10px;padding:6px 12px;border:1px solid var(--line)}
+.box small{display:block;font-size:11px;opacity:.65;letter-spacing:1px;text-transform:uppercase}
+.box b{font-family:"Russo One";font-size:24px;font-weight:400}
+.hud .tc{position:absolute;left:50%;top:12px;transform:translateX(-50%);text-align:center}
+.hud .tc b{font-size:22px}
+.hud .sub{font-size:14px;opacity:.85;margin-top:2px}
+.hud .br{position:absolute;right:16px;bottom:14px;text-align:right}
+.spd{font-family:"Russo One";font-size:54px;line-height:1}
+.spd small{font-size:16px;opacity:.7;margin-left:4px}
+.gear{display:inline-block;font-family:"Russo One";font-size:26px;background:var(--g);border-radius:8px;padding:0 10px;margin-right:8px;vertical-align:10px}
+.rpm{height:8px;width:200px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden;margin:6px 0 0 auto}
+.rpm i{display:block;height:100%;width:0;background:linear-gradient(90deg,#00c46a,#f5c400 70%,#ff3b3b)}
+.msg{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-family:"Russo One";font-size:clamp(28px,6vw,56px);opacity:0;transition:opacity .25s;white-space:nowrap}
+.msg.on{opacity:1}
+.tag2{position:absolute;left:14px;bottom:14px;font-size:14px;opacity:.8;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:6px}
+#tower{position:fixed;left:14px;top:84px;z-index:5;pointer-events:none;font-size:15px;min-width:150px}
+#tower div{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.55);margin-bottom:2px;padding:2px 8px;border-radius:5px}
+#tower div.me{background:rgba(0,122,69,.85)}
+#tower .p{width:18px;opacity:.7}
+#map{position:fixed;right:14px;top:12px;z-index:5;width:170px;height:170px;pointer-events:none;background:rgba(0,0,0,.35);border-radius:14px}
+#lights{position:fixed;left:50%;top:18%;transform:translateX(-50%);display:none;gap:12px;z-index:8;background:#111;padding:10px 14px;border-radius:12px;border:2px solid #333}
+#lights i{width:34px;height:34px;border-radius:50%;background:#2a0000;display:block;box-shadow:inset 0 0 6px #000}
+#lights i.on{background:#ff2020;box-shadow:0 0 18px #ff2020}
+#topbtns{position:fixed;right:194px;top:12px;z-index:9;display:none;gap:6px}
+#topbtns button{padding:6px 10px;font-size:15px;background:rgba(0,0,0,.55)}
+#touch{position:fixed;inset:auto 0 0 0;height:42%;z-index:6;display:none}
+#touch div{position:absolute;bottom:18px;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
+#touch div.on{background:rgba(0,163,92,.55)}
+#tL{left:16px}#tR{left:112px}#tB{right:112px}#tG{right:16px;background:rgba(0,163,92,.3)!important}
+.split{position:fixed;left:0;right:0;top:50%;height:3px;background:#000;z-index:6;display:none}
+@media (max-width:640px){.grp>label{width:100%}.hud .tl{gap:6px}.box b{font-size:19px}.spd{font-size:40px}#map{width:120px;height:120px}#topbtns{right:142px}#tower{font-size:13px;top:76px}}
+
+/* ---------- mobile / touch ---------- */
+.touch-only{display:none!important}
+body.touch .touch-only{display:flex!important}
+.note{min-height:18px;font-size:14px;opacity:.8;color:var(--gold)}
+#touch{-webkit-touch-callout:none;touch-action:none;user-select:none}
+body.touch{touch-action:none}
+body.tilt #tL,body.tilt #tR{display:none}
+/* on phones the speedo moves to bottom-centre so it never sits under GAS/BRK */
+body.touch .hud .br{right:auto;left:50%;transform:translateX(-50%);text-align:center;bottom:10px}
+body.touch .rpm{margin:6px auto 0;width:150px}
+
+/* portrait phone: ask the player to rotate */
+#rotate{display:none;position:fixed;inset:0;z-index:100;background:#0b0f0d;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+#rotate .ph{width:64px;height:110px;border:4px solid #fff;border-radius:12px;position:relative;animation:rot 2s ease-in-out infinite}
+#rotate .ph::after{content:"";position:absolute;left:50%;bottom:6px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#fff}
+#rotate b{font-family:"Russo One";font-size:26px}
+#rotate small{opacity:.75;font-size:16px}
+@keyframes rot{0%,20%{transform:rotate(0)}50%,80%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+@media (orientation:portrait) and (pointer:coarse){#rotate{display:flex}}
+
+/* short landscape screens (phones on their side) */
+@media (max-height:520px){
+  .overlay{padding:8px}
+  .panel{padding:10px 14px;border-radius:14px}
+  .logo{font-size:30px}.logo i{height:24px;width:10px}
+  .tag,.help,.tracks small,.hide-short{display:none}
+  .settings{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  #g-track{grid-column:1/-1}
+  .grp{margin:4px 0;gap:8px;flex-wrap:nowrap}
+  .grp>label{width:62px;font-size:11px;flex:none}
+  .opts{gap:6px}
+  button{font-size:14px;padding:5px 9px;border-radius:8px}
+  .tracks button{min-width:0;flex:1}
+  .start{font-size:19px;padding:9px;margin-top:8px}
+  .best,.pad,.note{font-size:12px;margin-top:3px;min-height:0}
+  h2{font-size:22px;margin-bottom:8px}
+  table{font-size:14px}td,th{padding:3px 6px}
+  .row{margin-top:10px}.row button{padding:8px}
+  .box{padding:3px 9px}.box b{font-size:18px}.box small{font-size:10px}
+  .hud .tc b{font-size:17px}.hud .sub{font-size:12px}
+  .spd{font-size:34px}.gear{font-size:20px;vertical-align:6px}
+  #map{width:96px;height:96px;top:8px;right:8px}
+  #topbtns{right:112px;top:8px}
+  #tower{font-size:12px;top:62px;min-width:120px}
+  #tower div:nth-child(n+5):not(.me){display:none}
+  #lights{top:22%;padding:6px 10px;gap:8px}#lights i{width:22px;height:22px}
+  #touch div{width:74px;height:74px;bottom:12px}
+  #tL{left:12px}#tR{left:96px}#tB{right:96px}#tG{right:12px}
+}
+.hud.onboard .br{display:none}
