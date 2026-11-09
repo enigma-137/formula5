@@ -1,22 +1,24 @@
 /* Car physics, walls, lap counting, car-to-car collisions and standings. */
 import { wrapA, store, fmt } from './utils.js';
 import { VTOP, ACC, BRAKE, GRIP, S } from './config.js';
+const OFF_VTOP=68; // m/s (~245 km/h) top speed on the grass
 import { G } from './state.js';
 import { nearest } from './tracks.js';
 import { flash } from './hud.js';
 
 export function stepCar(c,inp,dt){
   const T=G.track; const off=Math.abs(c.lat)>T.hw+1.4;
-  const vtop=off?40:VTOP; let v=c.v;
+  // grass/run-off: a mild penalty (lower top speed, a bit less grip), not a wall of mud
+  const vtop=off?OFF_VTOP:VTOP; let v=c.v;
   c.thr=inp.thr; c.brk=inp.brk;
   c.steer+=(inp.str-c.steer)*Math.min(1,dt*(c.human?9:7));
-  if(inp.thr>0.02){ if(v<0) v+=30*inp.thr*dt; else v+=ACC*inp.thr*Math.max(0,1-(v/vtop)**2)*(off?0.6:1)*dt; }
+  if(inp.thr>0.02){ if(v<0) v+=30*inp.thr*dt; else v+=ACC*inp.thr*Math.max(0,1-(v/vtop)**2)*(off?0.85:1)*dt; }
   if(inp.brk>0.02){ if(v>0.5) v-=BRAKE*inp.brk*dt; else v=Math.max(-10,v-8*inp.brk*dt); }
   if(inp.thr<=0.02) v-=Math.sign(v)*(0.8+0.0006*v*v)*dt;
-  if(off && v>vtop) v-=(v-vtop)*1.3*dt;
+  if(off && v>vtop) v-=(v-vtop)*0.45*dt;
   const sa=c.steer*0.5/(1+Math.abs(v)*0.035);
   let w=v/3.6*Math.tan(sa);
-  const grip=off?24:GRIP, wmax=grip/Math.max(Math.abs(v),1);
+  const grip=off?GRIP*0.8:GRIP, wmax=grip/Math.max(Math.abs(v),1);
   if(Math.abs(w)>wmax){ w=Math.sign(w)*wmax; v-=Math.sign(v)*Math.min(Math.abs(v),Math.abs(v)*0.12*dt); }
   c.h=wrapA(c.h-w*dt); c.v=v;
   c.x+=Math.sin(c.h)*v*dt; c.z+=Math.cos(c.h)*v*dt;
@@ -24,7 +26,7 @@ export function stepCar(c,inp,dt){
   c.lat=(c.x-T.px[i])*T.nx[i]+(c.z-T.pz[i])*T.nz[i];
   const lim=T.hw+T.wallOff-1.1;
   if(Math.abs(c.lat)>lim){ const s=Math.sign(c.lat), push=c.lat-s*lim; c.x-=T.nx[i]*push; c.z-=T.nz[i]*push; c.lat=s*lim;
-    if(!c.wall){ c.v*=0.72; const vw=G.views.find(q=>q.car===c); if(vw) vw.shake=0.35; }
+    if(!c.wall){ c.v*=0.85; const vw=G.views.find(q=>q.car===c); if(vw) vw.shake=0.35; }
     c.wall=true; const th=Math.atan2(T.tx[i],T.tz[i]); const d=wrapA(th-c.h); if(Math.abs(d)<Math.PI/2) c.h=wrapA(c.h+d*Math.min(1,dt*3)); }
   else c.wall=false;
   lapLogic(c,prev);

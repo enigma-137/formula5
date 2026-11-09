@@ -117,3 +117,14 @@ body.touch .rpm{margin:6px auto 0;width:150px}
   #tL{left:12px}#tR{left:96px}#tB{right:96px}#tG{right:12px}
 }
 .hud.onboard .br{display:none}
+/* virtual joystick (left side of the screen) */
+#touch #stick{display:none;position:absolute;left:0;bottom:0;top:0;width:45%;height:auto;border:0;border-radius:0;background:none;touch-action:none}
+body.stick #touch #stick{display:block}
+body.stick #tL,body.stick #tR{display:none}
+#stick b{position:absolute;left:26px;bottom:18px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center}
+#stick b::before,#stick b::after{content:"◀";position:absolute;left:12px;opacity:.45;font-size:16px}
+#stick b::after{content:"▶";left:auto;right:12px}
+#stick i{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.35);border:2px solid rgba(255,255,255,.6);box-shadow:0 4px 14px rgba(0,0,0,.35)}
+#stick.on b{background:rgba(255,255,255,.16)}
+#stick.on i{background:rgba(0,163,92,.7)}
+@media (max-height:520px){#stick b{width:112px;height:112px;left:16px;bottom:10px}#stick i{width:54px;height:54px}}

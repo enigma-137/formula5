@@ -14,6 +14,7 @@ export function syncMenu(){
   $('#g-laps').style.display=S.mode==='tt'?'none':'flex'; $('#g-bots').style.display=S.mode==='tt'?'none':'flex'; $('#g-diff').style.display=S.mode==='tt'?'none':'flex';
   const rec=store.get('f5_best_'+S.track,null); $('#bestline').textContent=rec?`⏱ Your ${TRACKS[S.track].name} record: ${fmt(rec)}`:'';
   document.body.classList.toggle('tilt',isTouch && S.steer==='tilt');
+  document.body.classList.toggle('stick',isTouch && S.steer==='stick');
 }
 function useTilt(){
   const note=$('#steerNote');
