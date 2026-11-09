@@ -31,6 +31,24 @@ const touch={l:false,r:false,g:false,b:false};
   el.addEventListener('pointerdown',on); el.addEventListener('pointerup',off); el.addEventListener('pointerleave',off); el.addEventListener('pointercancel',off);
   el.addEventListener('contextmenu',e=>e.preventDefault()); });
 
+/* ---------------- virtual joystick ----------------
+   Touch anywhere on the left part of the screen: the stick appears under your
+   thumb, and sliding sideways steers. Small slide = small steer. */
+const STICK_R=55;                 // px of thumb travel for full lock
+const stick={id:null,ox:0,x:0};
+{ const zone=$('#stick'), base=$('#stick b'), knob=$('#stick i');
+  const reset=()=>{ stick.id=null; stick.x=0; knob.style.transform=''; base.style.left=base.style.top=base.style.bottom=''; zone.classList.remove('on'); };
+  zone.addEventListener('pointerdown',e=>{ e.preventDefault(); if(stick.id!==null) return;
+    stick.id=e.pointerId; stick.ox=e.clientX; try{ zone.setPointerCapture(e.pointerId); }catch(_){}
+    const r=zone.getBoundingClientRect(), half=base.offsetWidth/2;
+    base.style.left=(e.clientX-r.left-half)+'px'; base.style.top=(e.clientY-r.top-half)+'px'; base.style.bottom='auto'; zone.classList.add('on'); });
+  zone.addEventListener('pointermove',e=>{ if(e.pointerId!==stick.id) return; e.preventDefault();
+    const dx=clamp(e.clientX-stick.ox,-STICK_R,STICK_R); stick.x=dx/STICK_R; knob.style.transform=`translateX(${dx}px)`; });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>zone.addEventListener(t,e=>{ if(e.pointerId===stick.id) reset(); }));
+  zone.addEventListener('contextmenu',e=>e.preventDefault());
+}
+function stickSteer(){ const a=Math.abs(stick.x); if(a<0.06) return 0; return Math.sign(stick.x)*Math.pow((a-0.06)/0.94,1.25); }
+
 /* ---------------- tilt steering ----------------
    Hold the phone sideways like a steering wheel. We take gravity from the
    accelerometer, rotate it into screen coordinates and measure how far the
@@ -80,6 +98,7 @@ export function readInput(pi){
     pads.forEach(p=>merge(padInput(p))); merge(keyInput(KB1)); merge(keyInput(KB2));
     merge({thr:touch.g?1:0,brk:touch.b?1:0,str:(touch.r?1:0)-(touch.l?1:0)});
     if(S.steer==='tilt' && tilt.have) merge({thr:0,brk:0,str:tiltSteer()});
+    if(S.steer==='stick') merge({thr:0,brk:0,str:stickSteer()});
   }
   else { if(pads[pi]) merge(padInput(pads[pi])); merge(keyInput(pi===0?KB1:KB2)); }
   return out;
