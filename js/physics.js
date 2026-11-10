@@ -5,6 +5,7 @@ const OFF_VTOP=68; // m/s (~245 km/h) top speed on the grass
 import { G } from './state.js';
 import { nearest, PAD_LEN } from './tracks.js';
 import { flash } from './hud.js';
+import { submitLap } from './profile.js';
 
 export function stepCar(c,inp,dt){
   const T=G.track; const off=Math.abs(c.lat)>T.hw+1.4;
@@ -52,13 +53,14 @@ function crossLine(c){
   const t=G.raceTime, game=G.game;
   if(c.lap>=1 && !c.noTime){ const lt=t-c.lapStart; c.lastLap=lt; c.laps.push(lt); if(!c.best||lt<c.best) c.best=lt;
     if(!G.fastest||lt<G.fastest.t) G.fastest={t:lt,name:c.name};
-    if(c.human){ if(S.mode==='tt'){ const key='f5_best_'+S.track, rec=store.get(key,null); if(!rec||lt<rec){ store.set(key,lt); flash(c,'NEW RECORD '+fmt(lt),2.2); } else flash(c,fmt(lt),1.6); }
-      else if(c.lap<game.laps) flash(c,'LAP '+fmt(lt),1.4); } }
+    if(c.human){ const pb=submitLap(S.track,lt);   // personal best counts in every mode
+      if(S.mode==='tt') flash(c,pb?'NEW RECORD '+fmt(lt):fmt(lt),pb?2.2:1.6);
+      else if(c.lap<game.laps) flash(c,(pb?'NEW PB ':'LAP ')+fmt(lt),pb?2:1.4); } }
   c.noTime=false;
   if(c.lap>=1) c.lapStart=t;
   c.lap++;
   if(S.mode!=='tt'){
-    if(c.lap>game.laps && !c.finished){ c.finished=true; c.finishTime=t; c.place=++G.finishCount; if(c.human) flash(c,c.place===1?'🏆 WINNER!':'FINISHED P'+c.place,3); }
+    if(c.lap>game.laps && !c.finished){ c.finished=true; c.finishTime=t; G.finishCount++; c.place=1+game.cars.filter(o=>o!==c&&o.finished).length; if(c.human) flash(c,c.place===1?'🏆 WINNER!':'FINISHED P'+c.place,3); }
     else if(c.human && c.lap===game.laps && game.laps>1) flash(c,'FINAL LAP',1.8);
   }
 }
@@ -68,8 +70,10 @@ export function resetCar(c){ if(!c) return; const T=G.track,i=(c.idx+2)%T.N; c.x
 export function collide(){
   const cs=G.game.cars;
   for(let a=0;a<cs.length;a++) for(let b=a+1;b<cs.length;b++){ const A=cs[a],B=cs[b]; const dx=B.x-A.x, dz=B.z-A.z, d2=dx*dx+dz*dz; if(d2>16||d2<1e-6) continue;
-    const d=Math.sqrt(d2), p=(4-d)/2, nx=dx/d, nz=dz/d; A.x-=nx*p; A.z-=nz*p; B.x+=nx*p; B.z+=nz*p;
-    const [back,front]=progDist(A,B)>0?[A,B]:[B,A]; if(back.v>front.v){ const m=(back.v+front.v)/2; back.v=m-0.5; front.v=Math.max(front.v,m*0.98); }
+    // an online rival's car is placed by their phone, so only our side gets pushed
+    const d=Math.sqrt(d2), p=(4-d)/2, nx=dx/d, nz=dz/d, wa=A.remote?0:B.remote?2:1, wb=B.remote?0:A.remote?2:1;
+    A.x-=nx*p*wa; A.z-=nz*p*wa; B.x+=nx*p*wb; B.z+=nz*p*wb;
+    const [back,front]=progDist(A,B)>0?[A,B]:[B,A]; if(back.v>front.v){ const m=(back.v+front.v)/2; if(!back.remote) back.v=m-0.5; if(!front.remote) front.v=Math.max(front.v,m*0.98); }
     [A,B].forEach(c=>{ const vw=G.views.find(q=>q.car===c); if(vw) vw.shake=Math.max(vw.shake,0.15); }); }
 }
 /** Race order: finishers by time, then everyone else by distance covered. */

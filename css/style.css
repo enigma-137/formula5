@@ -129,3 +129,34 @@ body.stick #tL,body.stick #tR{display:none}
 #stick.on i{background:rgba(0,163,92,.7)}
 @media (max-height:520px){#stick b{width:112px;height:112px;left:16px;bottom:10px}#stick i{width:54px;height:54px}}
 .hud.boosting .kmh{color:#7ff3ff;text-shadow:0 0 14px #00e5ff}.hud.boosting .rpm i{background:linear-gradient(90deg,#00e5ff,#b8fbff)}
+/* online 1v1 + stats */
+.online{display:none;margin:8px 0 2px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+body.mode-online .online{display:block}
+.orow{display:flex;align-items:center;gap:8px;margin:4px 0;flex-wrap:wrap}
+.orow label,.orow .lbl{width:88px;font-weight:700;opacity:.7;text-transform:uppercase;font-size:13px;letter-spacing:1px}
+.orow input{font:inherit;font-size:17px;font-weight:700;color:#fff;background:rgba(0,0,0,.35);border:2px solid var(--line);border-radius:10px;padding:7px 10px;width:150px;outline:none}
+.orow input:focus{border-color:var(--gold)}
+#codeIn{width:100px;text-transform:uppercase;letter-spacing:3px;text-align:center}
+.orow .or{opacity:.6;font-size:14px}
+#roomCode{font-family:"Russo One";font-size:26px;letter-spacing:4px;color:var(--gold);padding:0 6px}
+.ostatus{font-size:14px;opacity:.85;min-height:18px}
+.start:disabled{background:#2a3a32;color:rgba(255,255,255,.75);cursor:default;font-size:18px}
+.linkbtn{background:none;padding:4px 0;margin-top:6px;font-size:15px;opacity:.85;text-decoration:underline}
+.pts{margin-top:10px;font-size:18px;color:var(--gold);font-weight:700;min-height:22px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat-grid div{background:rgba(255,255,255,.06);border-radius:10px;padding:8px 10px}
+.stat-grid b{display:block;font-family:"Russo One";font-size:24px;color:var(--gold)}
+.stat-grid small{opacity:.7;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+@media (max-height:520px){
+  .online{padding:6px 10px;margin:4px 0}
+  .orow{margin:2px 0;gap:6px}.orow label,.orow .lbl{width:62px;font-size:11px}
+  .orow input{font-size:14px;padding:4px 8px;width:120px}#codeIn{width:84px}
+  #roomCode{font-size:20px}.ostatus{font-size:12px}
+  .stat-grid b{font-size:18px}.linkbtn{font-size:12px;margin-top:2px}
+}
+.orow[hidden]{display:none}
+@media (max-height:520px){
+  .start{position:sticky;bottom:0;z-index:2;box-shadow:0 -8px 16px rgba(10,16,13,.9)}
+  .orow label{display:none}
+  .stat-grid{grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:8px}.stat-grid div{padding:5px 6px}.stat-grid small{font-size:9px}
+}

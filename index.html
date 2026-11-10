@@ -32,7 +32,7 @@
     <button data-v="abuja"><b>Abuja</b><small>Aso Rock Ring</small></button>
     <button data-v="benin"><b>Benin</b><small>Ancient Walls Circuit</small></button></div></div>
    <div class="grp"><label>Mode</label><div class="opts" data-k="mode">
-    <button data-v="race">Race vs Bots</button><button data-v="tt">Time Trial</button><button data-v="duo">2 Players</button></div></div>
+    <button data-v="race">Race vs Bots</button><button data-v="tt">Time Trial</button><button data-v="duo">2 Players</button><button data-v="online">Online 1v1</button></div></div>
    <div class="grp" id="g-laps"><label>Laps</label><div class="opts" data-k="laps">
     <button data-v="2">2</button><button data-v="3">3</button><button data-v="5">5</button><button data-v="10">10</button></div></div>
    <div class="grp" id="g-bots"><label>Bots</label><div class="opts" data-k="bots">
@@ -46,10 +46,17 @@
    <div class="grp touch-only" id="g-steer"><label>Steering</label><div class="opts" data-k="steer">
     <button data-v="stick">Joystick</button><button data-v="buttons">Buttons</button><button data-v="tilt">Tilt phone</button></div></div>
   </div>
+  <div id="onlineBox" class="online">
+   <div class="orow"><label for="nameIn">Your name</label><input id="nameIn" maxlength="14" autocomplete="nickname" placeholder="Your name"></div>
+   <div class="orow" id="oIdle"><button id="hostBtn">Create room</button><span class="or">or join</span><input id="codeIn" maxlength="5" placeholder="CODE" autocapitalize="characters" autocomplete="off" spellcheck="false"><button id="joinBtn">Join</button></div>
+   <div class="orow" id="oRoom" hidden><span class="lbl">Room</span><b id="roomCode"></b><button id="shareBtn">📤 Share link</button><button id="leaveBtn">Leave</button></div>
+   <div class="ostatus" id="oStatus">Host picks the track and laps, then presses START.</div>
+  </div>
   <div class="note" id="steerNote"></div>
   <div class="best" id="bestline"></div>
   <button id="startBtn" class="start">START ▶</button>
   <div class="pad" id="padStatus"></div>
+  <button id="statsBtn" class="linkbtn">📊 My stats &amp; points</button>
   <div class="help">
    <b>Pad:</b> RT gas · LT brake · left stick steer · Y reset car · LB/RB camera (incl. cockpit view) · Start pause · A select in menus<br>
    <b>Keyboard:</b> P1 W A S D · P2 arrow keys (solo: either) · C/V camera · R reset · Esc pause · M mute<br>
@@ -64,9 +71,16 @@
  <div class="row" style="flex-direction:column"><button id="resumeBtn">Resume</button><button id="restartBtn">Restart</button><button id="quitBtn">Main menu</button></div>
 </div></div>
 
+<div id="stats" class="overlay"><div class="panel" style="width:min(520px,100%)">
+ <h2>My stats</h2>
+ <div id="statsBody"></div>
+ <div class="row"><button id="statsClose">Back</button></div>
+</div></div>
+
 <div id="results" class="overlay"><div class="panel" style="width:min(560px,100%)">
  <h2 id="resTitle">Results</h2>
  <table id="resTable"></table>
+ <div class="pts" id="resPts"></div>
  <div class="row"><button id="againBtn">Race again</button><button id="resMenuBtn">Main menu</button></div>
 </div></div>
 

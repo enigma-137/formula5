@@ -14,6 +14,8 @@ import { readInput } from './input.js';
 import { buildHUD } from './hud.js';
 import { initAudio } from './audio.js';
 import { showOverlay } from './menu.js';
+import { net } from './net.js';
+import { oppName, updateRemote } from './online.js';
 
 const R0=Math.random;
 
@@ -35,10 +37,15 @@ export function startGame(){
     G.game.cars.forEach(c=>{ G.scene.remove(c.mesh); c.mesh.traverse(o=>{ if(o.material) o.material.dispose?.(); }); });
   }
   const humans = S.mode==='duo'?2:1;
-  const nb = S.mode==='tt'?0:S.bots;
+  const nb = S.mode==='tt'||S.mode==='online'?0:S.bots;
   const cars=[];
   for(let b=0;b<nb;b++){ const [n,c,a]=BOTS[b]; const car=newCar(n,c,a,false,-1); car.skill=DIFF[S.diff]*(1+(R0()-0.5)*0.05)*(1-b*0.004); car.line=(R0()-0.5)*4; cars.push(car); }
-  for(let h=0;h<humans;h++){ const [n,c,a]=HUMANS[h]; cars.push(newCar(humans===1?'You':n,c,a,true,h)); }
+  if(S.mode==='online'){
+    // same grid on both phones: host in slot 0 (green), guest in slot 1 (gold)
+    const me=net.role==='guest'?1:0;
+    for(let k=0;k<2;k++){ const [,c,a]=HUMANS[k]; const car=newCar(k===me?'You':oppName,c,a,k===me,0); if(k!==me) car.remote=true; cars.push(car); }
+  }
+  else for(let h=0;h<humans;h++){ const [n,c,a]=HUMANS[h]; cars.push(newCar(humans===1?'You':n,c,a,true,h)); }
   cars.forEach((c,k)=>{ const s=spawnSlot(k); Object.assign(c,{x:s.x,z:s.z,h:s.h,idx:s.idx}); c.prevIdx=s.idx; placeMesh(c,0); });
   G.game={cars, humans:cars.filter(c=>c.human).sort((a,b)=>a.pi-b.pi), laps:S.mode==='tt'?Infinity:S.laps};
   G.views.length=0;
@@ -55,6 +62,7 @@ export function startGame(){
 export function simulate(dt){
   const racing=G.state==='race';
   for(const c of G.game.cars){
+    if(c.remote){ updateRemote(c,dt); continue; }   // online rival: moved by their updates
     let inp;
     if(!racing) inp={thr:0,brk:1,str:0};
     else if(c.human && !c.finished && !c.auto) inp=readInput(c.pi);

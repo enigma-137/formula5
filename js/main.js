@@ -17,6 +17,9 @@
      audio.js     engine sound
      menu.js      menu / pause / results screens
      race.js      race setup and per-frame simulation
+     net.js       peer-to-peer connection (PeerJS)
+     online.js    online 1v1 rooms and the rival's car
+     profile.js   points, stats, personal bests (saved on device)
 */
 import { $, isTouch } from './utils.js';
 import { S } from './config.js';
@@ -30,6 +33,7 @@ import { updateHUD, flash } from './hud.js';
 import { updateAudio } from './audio.js';
 import { syncMenu, showResults, togglePause } from './menu.js';
 import { startGame, simulate } from './race.js';
+import { onlineTick } from './online.js';
 
 let last=performance.now();
 function frame(t){
@@ -51,6 +55,7 @@ function frame(t){
     render();
   } else if(game && G.state.startsWith('paused')){ render(); }
   else renderMenu(dt);
+  onlineTick(dt);
   updateAudio();
 }
 
