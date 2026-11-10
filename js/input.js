@@ -120,6 +120,7 @@ export function pollPadButtons(){
       if(e('down')||e('right')) moveFocus(ov,1);
       if(e('a')){ const f=ov.querySelector('button.focus'); if(f) f.click(); else moveFocus(ov,0); }
       if(e('b') && ov.id==='pause') togglePause();
+      if(e('b') && ov.id==='stats') $('#statsClose').click();
       if(e('start') && ov.id==='pause') togglePause();
       else if(e('start') && ov.id==='menu') $('#startBtn').click();
     } else if(game && (G.state==='race'||G.state==='countdown')){
@@ -133,7 +134,7 @@ export function pollPadButtons(){
   const ps=$('#padStatus'); const txt=pads.length?`🎮 ${pads.length} controller${pads.length>1?'s':''} connected — use the stick and A to pick`:'🎮 No controller detected yet. Plug it in and press any button.';
   if(ps.textContent!==txt) ps.textContent=txt;
 }
-function currentOverlay(){ return ['#menu','#pause','#results'].map(s=>$(s)).find(o=>o.classList.contains('show')); }
+function currentOverlay(){ return ['#menu','#pause','#results','#stats'].map(s=>$(s)).find(o=>o.classList.contains('show')); }
 export function moveFocus(ov,d){
   const list=[...ov.querySelectorAll('button')].filter(b=>b.offsetParent!==null);
   let i=list.findIndex(b=>b.classList.contains('focus'));
