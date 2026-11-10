@@ -46,6 +46,7 @@ function frame(t){
     game.cars.forEach(c=>placeMesh(c,dt));
     G.views.forEach(v=>{ updateCam(v,dt); if(v.mode===3) updateCockpit(v.car); });
     const f=G.views[0].car; G.sun.position.set(f.x+120,220,f.z+80); G.sun.target.position.set(f.x,0,f.z);
+    if(G.boostTex) G.boostTex.offset.y+=dt*1.6;
     updateHUD(dt);
     render();
   } else if(game && G.state.startsWith('paused')){ render(); }

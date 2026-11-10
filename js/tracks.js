@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { clamp, rng } from './utils.js';
 import { VTOP, BRAKE, GRIP, TRACKS, S } from './config.js';
 import { G } from './state.js';
-import { texAsphalt, texKerb, texGround, texChecker, texWall } from './textures.js';
+import { texAsphalt, texKerb, texGround, texChecker, texWall, texBoost } from './textures.js';
 import { drawMapBase } from './hud.js';
 
 /* ---------------- track ---------------- */
@@ -23,7 +23,20 @@ export function makeTrack(def){
   for(let pass=0;pass<2;pass++) for(let i=N-1;i>=0;i--){ const nv=T.prof[(i+1)%N]; T.prof[i]=Math.min(T.prof[i],Math.sqrt(nv*nv+2*aB*ds)); }
   let minX=1e9,maxX=-1e9,minZ=1e9,maxZ=-1e9; for(let i=0;i<N;i++){ minX=Math.min(minX,T.px[i]); maxX=Math.max(maxX,T.px[i]); minZ=Math.min(minZ,T.pz[i]); maxZ=Math.max(maxZ,T.pz[i]); }
   Object.assign(T,{minX,maxX,minZ,maxZ,cx:(minX+maxX)/2,cz:(minZ+maxZ)/2});
+  T.pads=placePads(T);
   return T;
+}
+/** Boost pads: one near the start of every long straight, alternating towards
+    the left/right edge of the road so you have to choose your line. */
+function placePads(T){
+  const N=T.N, pads=[]; let run=0, side=1;
+  for(let j=0;j<N*2 && pads.length<6;j++){ const i=j%N;
+    if(T.curv[i]<0.004) run++; else run=0;
+    if(run===12){ const at=(i+4)%N;
+      const nearGrid=at<30||at>N-40, tooClose=pads.some(p=>Math.min(Math.abs(p.i-at),N-Math.abs(p.i-at))<60);
+      if(!nearGrid && !tooClose){ pads.push({i:at,lat:side*4.0}); side=-side; } }
+  }
+  return pads;
 }
 export function nearest(T,x,z,hint){
   let best=0,bd=1e18; const N=T.N;
@@ -52,6 +65,7 @@ export function wallRibbon(T,o,h,uScale){
 
 /* ---------------- world ---------------- */
 let scene; // the scene being built; also published as G.scene
+export const PAD_LEN=10; // metres
 export const boxGeo = new THREE.BoxGeometry(1,1,1).translate(0,0.5,0);
 const coneGeo = new THREE.ConeGeometry(0.75,1,4,1).translate(0,0.5,0).rotateY(Math.PI/4);
 const trunkGeo = new THREE.CylinderGeometry(0.12,0.18,1,6).translate(0,0.5,0);
@@ -89,6 +103,11 @@ export function buildWorld(key){
   scene.add(new THREE.Mesh(wallRibbon(T,T.hw+T.wallOff,1.3,-60),wm)); scene.add(new THREE.Mesh(wallRibbon(T,-T.hw-T.wallOff,1.3,60),wm));
   const fence=new THREE.MeshLambertMaterial({color:0x444a50,transparent:true,opacity:0.35,side:THREE.DoubleSide});
   [T.hw+T.wallOff+0.1,-T.hw-T.wallOff-0.1].forEach(o=>{ const g=wallRibbon(T,o,3.6,60); g.translate(0,1.3,0); scene.add(new THREE.Mesh(g,fence)); });
+  // boost pads (texture scrolls in main.js)
+  const bt=texBoost(); G.boostTex=bt;
+  const padMat=new THREE.MeshBasicMaterial({map:bt,transparent:true,depthWrite:false,toneMapped:false});
+  T.pads.forEach(p=>{ const m=new THREE.Mesh(new THREE.PlaneGeometry(4,PAD_LEN).rotateX(-Math.PI/2),padMat);
+    const i=(p.i+2)%T.N; m.position.set(T.px[i]+T.nx[i]*p.lat,0.05,T.pz[i]+T.nz[i]*p.lat); m.rotation.y=Math.atan2(T.tx[i],T.tz[i])+Math.PI; m.renderOrder=2; scene.add(m); });
   // start line + gantry
   const h0=Math.atan2(T.tx[0],T.tz[0]);
   const line=new THREE.Mesh(new THREE.PlaneGeometry(T.hw*2,2.4).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:texChecker()}));

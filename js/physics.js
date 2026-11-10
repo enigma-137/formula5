@@ -1,18 +1,20 @@
 /* Car physics, walls, lap counting, car-to-car collisions and standings. */
 import { wrapA, store, fmt } from './utils.js';
-import { VTOP, ACC, BRAKE, GRIP, S } from './config.js';
+import { VTOP, ACC, BRAKE, GRIP, S, BOOST_V, BOOST_ACC, BOOST_TIME } from './config.js';
 const OFF_VTOP=68; // m/s (~245 km/h) top speed on the grass
 import { G } from './state.js';
-import { nearest } from './tracks.js';
+import { nearest, PAD_LEN } from './tracks.js';
 import { flash } from './hud.js';
 
 export function stepCar(c,inp,dt){
   const T=G.track; const off=Math.abs(c.lat)>T.hw+1.4;
   // grass/run-off: a mild penalty (lower top speed, a bit less grip), not a wall of mud
-  const vtop=off?OFF_VTOP:VTOP; let v=c.v;
+  const boosting=c.boost>0; if(boosting) c.boost-=dt;
+  const vtop=(off?OFF_VTOP:VTOP)+(boosting?BOOST_V:0); let v=c.v;
   c.thr=inp.thr; c.brk=inp.brk;
   c.steer+=(inp.str-c.steer)*Math.min(1,dt*(c.human?9:7));
   if(inp.thr>0.02){ if(v<0) v+=30*inp.thr*dt; else v+=ACC*inp.thr*Math.max(0,1-(v/vtop)**2)*(off?0.85:1)*dt; }
+  if(boosting && v>=0 && v<vtop) v+=BOOST_ACC*Math.min(1,c.boost)*dt;
   if(inp.brk>0.02){ if(v>0.5) v-=BRAKE*inp.brk*dt; else v=Math.max(-10,v-8*inp.brk*dt); }
   if(inp.thr<=0.02) v-=Math.sign(v)*(0.8+0.0006*v*v)*dt;
   if(off && v>vtop) v-=(v-vtop)*0.45*dt;
@@ -24,12 +26,21 @@ export function stepCar(c,inp,dt){
   c.x+=Math.sin(c.h)*v*dt; c.z+=Math.cos(c.h)*v*dt;
   const prev=c.idx; c.idx=nearest(T,c.x,c.z,c.idx); const i=c.idx;
   c.lat=(c.x-T.px[i])*T.nx[i]+(c.z-T.pz[i])*T.nz[i];
+  hitPads(c,T);
   const lim=T.hw+T.wallOff-1.1;
   if(Math.abs(c.lat)>lim){ const s=Math.sign(c.lat), push=c.lat-s*lim; c.x-=T.nx[i]*push; c.z-=T.nz[i]*push; c.lat=s*lim;
     if(!c.wall){ c.v*=0.85; const vw=G.views.find(q=>q.car===c); if(vw) vw.shake=0.35; }
     c.wall=true; const th=Math.atan2(T.tx[i],T.tz[i]); const d=wrapA(th-c.h); if(Math.abs(d)<Math.PI/2) c.h=wrapA(c.h+d*Math.min(1,dt*3)); }
   else c.wall=false;
   lapLogic(c,prev);
+}
+/** Driving over a boost pad tops up the car's boost timer. */
+function hitPads(c,T){
+  const span=Math.ceil(PAD_LEN/T.ds);
+  for(const p of T.pads){ let d=c.idx-p.i; if(d<0) d+=T.N;
+    if(d<=span && Math.abs(c.lat-p.lat)<2.4){
+      if(!(c.boost>BOOST_TIME-0.3)){ if(c.human && !(c.boost>0)) flash(c,'⚡ BOOST',0.9); }
+      c.boost=BOOST_TIME; } }
 }
 function lapLogic(c,prev){
   const N=G.track.N;
