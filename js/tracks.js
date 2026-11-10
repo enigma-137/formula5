@@ -6,6 +6,7 @@ import { VTOP, BRAKE, GRIP, TRACKS, S } from './config.js';
 import { G } from './state.js';
 import { texAsphalt, texKerb, texGround, texChecker, texWall, texBoost } from './textures.js';
 import { drawMapBase } from './hud.js';
+import { addTraceIQ } from './ads.js';
 
 /* ---------------- track ---------------- */
 export function makeTrack(def){
@@ -103,6 +104,7 @@ export function buildWorld(key){
   scene.add(new THREE.Mesh(wallRibbon(T,T.hw+T.wallOff,1.3,-60),wm)); scene.add(new THREE.Mesh(wallRibbon(T,-T.hw-T.wallOff,1.3,60),wm));
   const fence=new THREE.MeshLambertMaterial({color:0x444a50,transparent:true,opacity:0.35,side:THREE.DoubleSide});
   [T.hw+T.wallOff+0.1,-T.hw-T.wallOff-0.1].forEach(o=>{ const g=wallRibbon(T,o,3.6,60); g.translate(0,1.3,0); scene.add(new THREE.Mesh(g,fence)); });
+  addTraceIQ(T,scene);   // sponsor panels + billboards (ads.js)
   // boost pads (texture scrolls in main.js)
   const bt=texBoost(); G.boostTex=bt;
   const padMat=new THREE.MeshBasicMaterial({map:bt,transparent:true,depthWrite:false,toneMapped:false});
@@ -121,11 +123,13 @@ export function buildWorld(key){
   const boxes=[], cones=[], trunks=[], canopies=[], crowd=[];
   const D=T.hw+T.wallOff;
   const rand=(a,b)=>a+R()*(b-a);
+  // keep trees and buildings from hiding the TraceIQ billboards
+  const nearAd=(x,z)=>T.ads.spots.some(s=>Math.hypot(s.x-x,s.z-z)<s.r);
   function place(count,pad,minD,maxD,fn){ let tries=0,n=0; while(n<count && tries<count*30){ tries++;
       const i=Math.floor(R()*T.N), side=R()<0.5?-1:1, off=side*rand(minD,maxD); const x=T.px[i]+T.nx[i]*off, z=T.pz[i]+T.nz[i]*off;
-      if(!clearOf(T,x,z,D+pad)) continue; fn(x,z,Math.atan2(T.tx[i],T.tz[i]),i); n++; } }
+      if(!clearOf(T,x,z,D+pad)||nearAd(x,z)) continue; fn(x,z,Math.atan2(T.tx[i],T.tz[i]),i); n++; } }
   function ring(count,pad,spread,fn){ let tries=0,n=0; while(n<count && tries<count*30){ tries++;
-      const x=rand(T.minX-spread,T.maxX+spread), z=rand(T.minZ-spread,T.maxZ+spread); if(!clearOf(T,x,z,D+pad)) continue; fn(x,z); n++; } }
+      const x=rand(T.minX-spread,T.maxX+spread), z=rand(T.minZ-spread,T.maxZ+spread); if(!clearOf(T,x,z,D+pad)||nearAd(x,z)) continue; fn(x,z); n++; } }
   function tree(x,z,s,col,palm){ if(palm){ trunks.push({x,z,sx:2,sy:s*2.2,sz:2,c:0x7a5a3a}); canopies.push({x,y:s*2.2,z,sx:s*0.7,sy:s*0.22,sz:s*0.7,c:col}); }
     else { trunks.push({x,z,sx:3,sy:s*0.9,sz:3,c:0x5d4128}); canopies.push({x,y:s*1.1,z,sx:s*0.75,sy:s*0.8,sz:s*0.75,c:col}); } }
   const q=hi?1:0.45;
@@ -159,7 +163,10 @@ export function buildWorld(key){
     [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{ boxes.push({x:mx+a*36,z:mz+b*36,sx:3.4,sy:62,sz:3.4,c:0xf4f1ea}); cones.push({x:mx+a*36,y:62,z:mz+b*36,sx:4.2,sy:8,sz:4.2,c:0xd4af37}); });
     ring(Math.round(55*q),25,300,(x,z)=>{ const w=rand(16,40); boxes.push({x,z,ry:rand(0,3),sx:w,sy:rand(8,34),sz:w*rand(0.6,1.2),c:[0xf4efe4,0xe7dcc6,0xd9cbb0,0xbfd1c5][Math.floor(R()*4)]}); });
     place(Math.round(260*q),3,D+3,D+90,(x,z)=>tree(x,z,rand(5,9),[0x2f7d32,0x3b8f3a,0x276b2b][Math.floor(R()*3)],false));
-    for(let i=0;i<8;i++){ const h=new THREE.Mesh(new THREE.SphereGeometry(1,16,8),new THREE.MeshLambertMaterial({color:0x5d8b3a})); const a=i/8*Math.PI*2, r=900; h.position.set(T.cx+Math.cos(a)*r,-60,T.cz+Math.sin(a)*r); h.scale.set(rand(200,320),rand(90,160),rand(200,320)); scene.add(h); }
+    for(let i=0;i<8;i++){ const h=new THREE.Mesh(new THREE.SphereGeometry(1,16,8),new THREE.MeshLambertMaterial({color:0x5d8b3a})); const a=i/8*Math.PI*2, sx=rand(200,320), sy=rand(90,160), sz=rand(200,320);
+      // keep the background hills well clear of the circuit (they used to poke over the road)
+      let r=Math.hypot(T.maxX-T.minX,T.maxZ-T.minZ)/2+Math.max(sx,sz)+60; while(!clearOf(T,T.cx+Math.cos(a)*r,T.cz+Math.sin(a)*r,D+Math.max(sx,sz)+40)) r+=60;
+      h.position.set(T.cx+Math.cos(a)*r,-60,T.cz+Math.sin(a)*r); h.scale.set(sx,sy,sz); scene.add(h); }
   } else {
     // Benin: earthen walls ringing the city, compounds with pyramid roofs, bronze statues
     const rad=Math.max(T.maxX-T.minX,T.maxZ-T.minZ)/2+D+120;
