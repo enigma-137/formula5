@@ -128,3 +128,4 @@ body.stick #tL,body.stick #tR{display:none}
 #stick.on b{background:rgba(255,255,255,.16)}
 #stick.on i{background:rgba(0,163,92,.7)}
 @media (max-height:520px){#stick b{width:112px;height:112px;left:16px;bottom:10px}#stick i{width:54px;height:54px}}
+.hud.boosting .kmh{color:#7ff3ff;text-shadow:0 0 14px #00e5ff}.hud.boosting .rpm i{background:linear-gradient(90deg,#00e5ff,#b8fbff)}

@@ -27,3 +27,9 @@ export function texWall(def){
   },true);
   t.wrapT=THREE.ClampToEdgeWrapping; return t;
 }
+/** Glowing chevrons for boost pads (pointing in the direction of travel). */
+export const texBoost = () => { const t=canvasTex(64,128,(g,w,h)=>{
+  g.clearRect(0,0,w,h); g.fillStyle='rgba(0,229,255,0.45)'; g.fillRect(0,0,w,h);
+  g.strokeStyle='rgba(0,229,255,0.9)'; g.lineWidth=6; g.strokeRect(2,0,w-4,h);
+  g.fillStyle='#b8fbff'; for(let k=0;k<2;k++){ const y=k*64; g.beginPath(); g.moveTo(8,y+44); g.lineTo(32,y+20); g.lineTo(56,y+44); g.lineTo(56,y+58); g.lineTo(32,y+34); g.lineTo(8,y+58); g.closePath(); g.fill(); }
+},true); return t; };

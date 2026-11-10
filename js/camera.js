@@ -26,6 +26,8 @@ export function updateCam(v,dt){
     const tx=c.x-fx*back, tz=c.z-fz*back, k=1-Math.exp(-dt*(far?5:9));
     v.p.x+=(tx-v.p.x)*k; v.p.z+=(tz-v.p.z)*k; v.p.y=up;
     cam.position.set(v.p.x+jx,v.p.y+jy,v.p.z); cam.lookAt(c.x+fx*7,1.1,c.z+fz*7); cam.fov=60+Math.abs(c.v)*0.13; }
+  // widen the view while boosting for a sense of speed
+  v.bf=(v.bf||0)+((c.boost>0?1:0)-(v.bf||0))*Math.min(1,dt*4); cam.fov+=v.bf*9;
   cam.updateProjectionMatrix();
 }
 /** Draw the race: full screen for one player, top/bottom split for two. */

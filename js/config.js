@@ -2,7 +2,9 @@
 import { store } from './utils.js';
 
 // car physics: top speed (m/s), acceleration, braking, lateral grip
-export const VTOP=92, ACC=15, BRAKE=46, GRIP=42;
+export const VTOP=96, ACC=24, BRAKE=48, GRIP=48;
+// boost pads: extra top speed (m/s), extra push (m/s²) and how long it lasts (s)
+export const BOOST_V=20, BOOST_ACC=17, BOOST_TIME=1.8;
 
 // Each track is a closed Catmull-Rom spline through `pts` (scaled x2 in tracks.js).
 export const TRACKS = {
