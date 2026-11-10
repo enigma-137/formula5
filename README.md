@@ -47,4 +47,5 @@ js/race.js        race setup and per-frame simulation
 js/net.js         peer-to-peer connection (PeerJS)
 js/online.js      online rooms, rematches, the rival's car
 js/profile.js     points, stats, personal bests
+js/ads.js         TraceIQ sponsor wall panels and billboards
 ```

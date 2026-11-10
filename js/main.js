@@ -20,6 +20,7 @@
      net.js       peer-to-peer connection (PeerJS)
      online.js    online 1v1 rooms and the rival's car
      profile.js   points, stats, personal bests (saved on device)
+     ads.js       TraceIQ sponsor wall panels and billboards
 */
 import { $, isTouch } from './utils.js';
 import { S } from './config.js';
